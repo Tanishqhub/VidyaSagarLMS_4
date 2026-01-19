@@ -1,0 +1,119 @@
+{% extends 'institute/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        {% if user.is_staff %}
+            All Batches
+        {% else %}
+            My Batches
+        {% endif %}
+    </h1>
+    {% if user.is_staff %}
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'create_batch' %}" class="btn btn-primary">Create New Batch</a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Batch Name</th>
+                <th>Course</th>
+                <th>Trainer</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Progress</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for batch in batches %}
+            <tr>
+                <td>
+                    <strong>{{ batch.name }}</strong>
+                </td>
+                <td>{{ batch.course.name }}</td>
+                <td>{{ batch.trainer.user.get_full_name }}</td>
+                <td>{{ batch.start_date }}</td>
+                <td>{{ batch.end_date }}</td>
+                <td>
+                    {% with progress=batch.get_completion_rate %}
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar {% if progress == 100 %}bg-success{% elif progress > 50 %}bg-primary{% else %}bg-warning{% endif %}" 
+                             role="progressbar" 
+                             style="width: {{ progress }}%"
+                             aria-valuenow="{{ progress }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ progress }}%
+                        </div>
+                    </div>
+                    {% endwith %}
+                </td>
+                <td>
+                    <span class="badge 
+                        {% if batch.status == 'completed' %}bg-success
+                        {% elif batch.status == 'ongoing' %}bg-warning
+                        {% else %}bg-secondary{% endif %}">
+                        {{ batch.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'batch_detail' batch.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center py-4">
+                    <div class="text-muted">
+                        <h5>No batches found</h5>
+                        {% if user.is_staff %}
+                        <p>Create your first batch to get started</p>
+                        <a href="{% url 'create_batch' %}" class="btn btn-primary mt-2">Create Batch</a>
+                        {% else %}
+                        <p>You are not assigned to any batches yet</p>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if batches.has_other_pages %}
+<nav aria-label="Batch pagination">
+    <ul class="pagination justify-content-center">
+        {% if batches.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ batches.previous_page_number }}">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Previous</span>
+        </li>
+        {% endif %}
+        
+        {% for i in batches.paginator.page_range %}
+        <li class="page-item {% if batches.number == i %}active{% endif %}">
+            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+        {% endfor %}
+        
+        {% if batches.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ batches.next_page_number }}">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Next</span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

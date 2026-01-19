@@ -1,0 +1,75 @@
+{% extends 'institute/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ batch.name }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <span class="badge bg-{% if batch.status == 'completed' %}success{% elif batch.status == 'ongoing' %}warning{% else %}secondary{% endif %} me-2">
+            {{ batch.get_status_display }}
+        </span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Course: {{ batch.course.name }}</h5>
+                <p class="card-text">Trainer: {{ batch.trainer.user.get_full_name }}</p>
+                <p class="card-text">Duration: {{ batch.start_date }} to {{ batch.end_date }}</p>
+            </div>
+        </div>
+
+        <h4>Course Progress: {{ completion_rate }}%</h4>
+        <div class="progress mb-4" style="height: 30px;">
+            <div class="progress-bar" role="progressbar" 
+                 style="width: {{ completion_rate }}%"
+                 aria-valuenow="{{ completion_rate }}" 
+                 aria-valuemin="0" 
+                 aria-valuemax="100">
+                {{ completion_rate }}%
+            </div>
+        </div>
+
+        {% for module, topics in topics_progress.items %}
+        <div class="card module-card mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{{ module.name }}</h5>
+                <small class="text-muted">Duration: {{ module.duration_hours }} hours</small>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for item in topics %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">{{ item.topic.name }}</h6>
+                        </div>
+                        <div>
+                            {% if not user.is_staff %}
+                            <form method="post" action="{% url 'mark_topic_complete' item.progress.id %}" class="d-inline">
+                                {% csrf_token %}
+                                {% if item.progress.completed %}
+                                    <span class="badge bg-success me-2">Completed</span>
+                                    <button type="submit" name="completed" value="false" class="btn btn-warning btn-sm">Mark Incomplete</button>
+                                {% else %}
+                                    <span class="badge bg-secondary me-2">Pending</span>
+                                    <button type="submit" name="completed" value="true" class="btn btn-success btn-sm">Mark Complete</button>
+                                {% endif %}
+                            </form>
+                            {% else %}
+                                {% if item.progress.completed %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Pending</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

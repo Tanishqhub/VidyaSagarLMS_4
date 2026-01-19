@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Institute SaaS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .progress-bar {
+            transition: width 0.6s ease;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .module-card {
+            border-left: 4px solid #0d6efd;
+        }
+        .sidebar {
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid rgba(0,0,0,.125);
+        }
+        .btn {
+            border-radius: 0.375rem;
+        }
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+        .progress {
+            border-radius: 0.375rem;
+        }
+        .progress-bar {
+            border-radius: 0.375rem;
+        }
+        .table th {
+            border-top: none;
+            font-weight: 600;
+        }
+        .module-card {
+            transition: transform 0.2s ease-in-out;
+        }
+        .module-card:hover {
+            transform: translateY(-2px);
+        }
+        .navbar-brand {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'dashboard' %}">
+                <i class="fas fa-graduation-cap me-2"></i>Training Institute
+            </a>
+            <div class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <span class="navbar-text me-3">
+                        <i class="fas fa-user me-1"></i>
+                        {{ user.get_full_name|default:user.username }}
+                        <small class="text-muted ms-1">
+                            ({% if user.userprofile.role %}{{ user.userprofile.get_role_display }}{% else %}User{% endif %})
+                        </small>
+                    </span>
+                    <a href="{% url 'logout' %}" class="nav-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="fas fa-sign-out-alt me-1"></i> Logout
+                    </a>
+                {% else %}
+                    <a class="nav-link" href="{% url 'login' %}">
+                        <i class="fas fa-sign-in-alt me-1"></i> Login
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hidden logout form -->
+    {% if user.is_authenticated %}
+    <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">
+        {% csrf_token %}
+    </form>
+    {% endif %}
+
+    <div class="container-fluid">
+        <div class="row">
+            {% if user.is_authenticated %}
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        {% if user.is_staff or user.userprofile.role == 'admin' %}
+                            <!-- Admin Menu -->
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' or request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'batch_list' %}active{% endif %}" href="{% url 'batch_list' %}">
+                                    <i class="fas fa-users me-2"></i>All Batches
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'create_batch' %}active{% endif %}" href="{% url 'create_batch' %}">
+                                    <i class="fas fa-plus-circle me-2"></i>Create Batch
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'trainer_list' %}active{% endif %}" href="{% url 'trainer_list' %}">
+                                    <i class="fas fa-chalkboard-teacher me-2"></i>Trainers
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'course_list' or request.resolver_match.url_name == 'course_detail' or request.resolver_match.url_name == 'create_course' %}active{% endif %}" href="{% url 'course_list' %}">
+                                    <i class="fas fa-book me-2"></i>Courses
+                                </a>
+                            </li>
+                            <!-- NEW: Team Management Menu Item -->
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'team_management' or request.resolver_match.url_name == 'create_team_member' %}active{% endif %}" href="{% url 'team_management' %}">
+                                    <i class="fas fa-users-cog me-2"></i>Team Management
+                                </a>
+                            </li>
+
+                        {% elif user.userprofile.role == 'trainer' or hasattr.user.trainer %}
+                            <!-- Trainer Menu -->
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' or request.resolver_match.url_name == 'trainer_dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                                    <i class="fas fa-tachometer-alt me-2"></i>My Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'trainer_batch_list' %}active{% endif %}" href="{% url 'trainer_batch_list' %}">
+                                    <i class="fas fa-users me-2"></i>My Batches
+                                </a>
+                            </li>
+
+                        {% elif user.userprofile.role == 'manager' %}
+                            <!-- Manager Menu (Future Implementation) -->
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Manager Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'batch_list' %}active{% endif %}" href="{% url 'batch_list' %}">
+                                    <i class="fas fa-users me-2"></i>View Batches
+                                </a>
+                            </li>
+
+                        {% elif user.userprofile.role == 'student' %}
+                            <!-- Student Menu (Future Implementation) -->
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Student Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">
+                                    <i class="fas fa-book me-2"></i>My Courses
+                                </a>
+                            </li>
+
+                        {% else %}
+                            <!-- Default Menu for users without specific role -->
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+
+                    <!-- User Profile Section -->
+                    {% if user.is_authenticated %}
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>User Profile</span>
+                        </h6>
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <small class="text-muted px-3">
+                                    <strong>Username:</strong> {{ user.username }}<br>
+                                    <strong>Role:</strong>
+                                    <span class="badge bg-{% if user.userprofile.role == 'admin' %}danger{% elif user.userprofile.role == 'manager' %}warning{% elif user.userprofile.role == 'trainer' %}info{% else %}secondary{% endif %}">
+                                        {{ user.userprofile.get_role_display|default:"User" }}
+                                    </span>
+                                    {% if user.email %}
+                                    <br><strong>Email:</strong> {{ user.email }}
+                                    {% endif %}
+                                </small>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </nav>
+            {% endif %}
+
+            <main class="{% if user.is_authenticated %}col-md-9 ms-sm-auto col-lg-10{% else %}col-12{% endif %} px-md-4">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mt-3" role="alert">
+                            <i class="fas
+                                {% if message.tags == 'success' %}fa-check-circle
+                                {% elif message.tags == 'error' or message.tags == 'danger' %}fa-exclamation-circle
+                                {% elif message.tags == 'warning' %}fa-exclamation-triangle
+                                {% else %}fa-info-circle{% endif %}
+                                me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+
+        // Handle logout confirmation
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.querySelector('a[href*="logout"]');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(e) {
+                    if (!confirm('Are you sure you want to logout?')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

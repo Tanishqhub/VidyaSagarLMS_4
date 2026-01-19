@@ -1,0 +1,29 @@
+{% extends 'institute/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Delete Topic</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Confirm Deletion</h5>
+                <p class="card-text">
+                    Are you sure you want to delete the topic <strong>"{{ topic.name }}"</strong>?
+                </p>
+                <p class="text-danger">
+                    <strong>Warning:</strong> This action cannot be undone.
+                </p>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Yes, Delete Topic</button>
+                    <a href="{% url 'course_detail' topic.module.course.id %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

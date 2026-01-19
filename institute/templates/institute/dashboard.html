@@ -1,0 +1,300 @@
+{% extends 'institute/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'team_management' %}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-users-cog me-1"></i>Manage Team
+        </a>
+        <a href="{% url 'create_batch' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i>Create Batch
+        </a>
+    </div>
+</div>
+
+<!-- Quick Stats Row -->
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Total Batches</h5>
+                        <h2 class="card-text">{{ total_batches }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Ongoing Batches</h5>
+                        <h2 class="card-text">{{ ongoing_batches }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-sync-alt fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Completed Batches</h5>
+                        <h2 class="card-text">{{ completed_batches }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Active Trainers</h5>
+                        <h2 class="card-text">{{ active_trainers }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chalkboard-teacher fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Team Overview Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3><i class="fas fa-users me-2"></i>Team Overview</h3>
+            <a href="{% url 'team_management' %}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-cog me-1"></i>Manage Team
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card text-white bg-dark mb-3">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <h5 class="card-title">Total Users</h5>
+                        <h2 class="card-text">{{ total_users }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-white bg-danger mb-3">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-shield fa-2x mb-2"></i>
+                        <h5 class="card-title">Admins</h5>
+                        <h2 class="card-text">{{ admin_count }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-white bg-warning mb-3">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-tie fa-2x mb-2"></i>
+                        <h5 class="card-title">Managers</h5>
+                        <h2 class="card-text">{{ manager_count }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-white bg-info mb-3">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chalkboard-teacher fa-2x mb-2"></i>
+                        <h5 class="card-title">Trainers</h5>
+                        <h2 class="card-text">{{ trainer_count }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-secondary mb-3">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-graduate fa-2x mb-2"></i>
+                        <h5 class="card-title">Students</h5>
+                        <h2 class="card-text">{{ student_count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-tasks me-2"></i>Batch Progress
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Batch Name</th>
+                                <th>Course</th>
+                                <th>Trainer</th>
+                                <th>Progress</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in batch_progress %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'batch_detail' item.batch.id %}">{{ item.batch.name }}</a>
+                                </td>
+                                <td>{{ item.batch.course.name }}</td>
+                                <td>{{ item.batch.trainer.user.get_full_name }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar {% if item.progress == 100 %}bg-success{% elif item.progress > 50 %}bg-primary{% else %}bg-warning{% endif %}"
+                                             role="progressbar"
+                                             style="width: {{ item.progress }}%"
+                                             aria-valuenow="{{ item.progress }}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100">
+                                            {{ item.progress }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if item.batch.status == 'completed' %}success{% elif item.batch.status == 'ongoing' %}warning{% else %}secondary{% endif %}">
+                                        {{ item.batch.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-3">
+                                    <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                                    No batches found
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Batches per Trainer
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm">
+                        <thead>
+                            <tr>
+                                <th>Trainer</th>
+                                <th>Total Batches</th>
+                                <th>Ongoing</th>
+                                <th>Completed</th>
+                                <th>Avg Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trainer_stat in trainer_stats %}
+                            <tr>
+                                <td>
+                                    <strong>{{ trainer_stat.trainer.user.get_full_name }}</strong>
+                                    {% if not trainer_stat.trainer.is_active %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ trainer_stat.total_batches }}</td>
+                                <td>
+                                    <span class="badge bg-warning">{{ trainer_stat.ongoing_batches }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">{{ trainer_stat.completed_batches }}</span>
+                                </td>
+                                <td>
+                                    {% if trainer_stat.total_batches > 0 %}
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-info" role="progressbar"
+                                             style="width: {{ trainer_stat.avg_progress }}%"
+                                             aria-valuenow="{{ trainer_stat.avg_progress }}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100">
+                                            {{ trainer_stat.avg_progress|floatformat:1 }}%
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <span class="text-muted">No batches</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-3">
+                                    <i class="fas fa-chalkboard-teacher fa-2x mb-2"></i><br>
+                                    No trainer statistics available
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h6 class="mt-4 mb-3">
+                    <i class="fas fa-chart-bar me-2"></i>Trainer Performance
+                </h6>
+                <div class="row">
+                    {% for trainer_stat in trainer_stats %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ trainer_stat.trainer.user.get_full_name }}</h6>
+                                <div class="d-flex justify-content-between">
+                                    <small>Total: {{ trainer_stat.total_batches }}</small>
+                                    <small>Ongoing: {{ trainer_stat.ongoing_batches }}</small>
+                                    <small>Completed: {{ trainer_stat.completed_batches }}</small>
+                                </div>
+                                {% if trainer_stat.total_batches > 0 %}
+                                <div class="progress mt-2" style="height: 10px;">
+                                    <div class="progress-bar bg-success" style="width: {{ trainer_stat.completion_rate }}%"></div>
+                                    <div class="progress-bar bg-warning" style="width: {{ trainer_stat.ongoing_rate }}%"></div>
+                                </div>
+                                <small class="text-muted">
+                                    Completion: {{ trainer_stat.completion_rate|floatformat:1 }}%
+                                </small>
+                                {% else %}
+                                <small class="text-muted">No batches assigned</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

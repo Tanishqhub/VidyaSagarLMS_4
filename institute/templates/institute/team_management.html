@@ -1,0 +1,112 @@
+{% extends 'institute/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-users-cog me-2"></i>Team Management
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'create_team_member' %}" class="btn btn-primary">
+            <i class="fas fa-user-plus me-1"></i>Add Team Member
+        </a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for member in team_members %}
+            <tr>
+                <td>
+                    <strong>{{ member.user.get_full_name|default:member.user.username }}</strong>
+                </td>
+                <td>{{ member.user.username }}</td>
+                <td>{{ member.user.email }}</td>
+                <td>
+                    <span class="badge bg-{% if member.profile.role == 'admin' %}danger{% elif member.profile.role == 'manager' %}warning{% elif member.profile.role == 'trainer' %}info{% else %}secondary{% endif %}">
+                        {{ member.profile.get_role_display }}
+                    </span>
+                </td>
+                <td>{{ member.profile.department|default:"-" }}</td>
+                <td>
+                    {% if member.profile.role == 'trainer' %}
+                        <span class="badge bg-{% if member.is_trainer %}success{% else %}secondary{% endif %}">
+                            {{ member.is_trainer|yesno:"Active,Inactive" }}
+                        </span>
+                    {% else %}
+                        <span class="badge bg-success">Active</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <form method="post" action="{% url 'update_team_member_role' member.user.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <select name="role" class="form-select form-select-sm d-inline w-auto" onchange="this.form.submit()">
+                            <option value="admin" {% if member.profile.role == 'admin' %}selected{% endif %}>Admin</option>
+                            <option value="manager" {% if member.profile.role == 'manager' %}selected{% endif %}>Manager</option>
+                            <option value="trainer" {% if member.profile.role == 'trainer' %}selected{% endif %}>Trainer</option>
+                            <option value="student" {% if member.profile.role == 'student' %}selected{% endif %}>Student</option>
+                        </select>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center py-4">
+                    <div class="text-muted">
+                        <i class="fas fa-users fa-3x mb-3"></i>
+                        <h5>No team members found</h5>
+                        <p>Add your first team member to get started</p>
+                        <a href="{% url 'create_team_member' %}" class="btn btn-primary mt-2">
+                            <i class="fas fa-user-plus me-1"></i>Add Team Member
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if team_members.has_other_pages %}
+<nav aria-label="Team pagination">
+    <ul class="pagination justify-content-center">
+        {% if team_members.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ team_members.previous_page_number }}">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Previous</span>
+        </li>
+        {% endif %}
+
+        {% for i in team_members.paginator.page_range %}
+        <li class="page-item {% if team_members.number == i %}active{% endif %}">
+            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+        {% endfor %}
+
+        {% if team_members.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ team_members.next_page_number }}">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Next</span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

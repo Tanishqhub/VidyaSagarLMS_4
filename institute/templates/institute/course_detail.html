@@ -1,0 +1,109 @@
+{% extends 'institute/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ course.name }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'edit_course' course.id %}" class="btn btn-primary me-2">Edit Course</a>
+        <a href="{% url 'add_module' course.id %}" class="btn btn-success me-2">Add Module</a>
+        <a href="{% url 'course_list' %}" class="btn btn-secondary">Back to Courses</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="card-title">Course Information</h5>
+                        <p class="card-text">{{ course.description }}</p>
+                    </div>
+                    <a href="{% url 'edit_course' course.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <strong>Total Duration:</strong> {{ course.total_duration_hours }} hours
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Modules:</strong> {{ course.get_total_modules }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Topics:</strong> {{ course.get_total_topics }}
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <span class="badge bg-{% if course.is_active %}success{% else %}secondary{% endif %}">
+                        {% if course.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <h4>Course Modules</h4>
+        {% for module in modules %}
+        <div class="card module-card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ module.name }}</h5>
+                <div>
+                    <span class="badge bg-info me-2">Order: {{ module.order }}</span>
+                    <div class="btn-group">
+                        <a href="{% url 'edit_module' module.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a href="{% url 'delete_module' module.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if module.description %}
+                <p class="card-text">{{ module.description }}</p>
+                {% endif %}
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <small class="text-muted">
+                        {{ module.get_topics_count }} topics • {{ module.get_total_duration }} hours
+                    </small>
+                    <a href="{% url 'add_topic' module.id %}" class="btn btn-sm btn-outline-success">Add Topic</a>
+                </div>
+
+                {% if module.topics.all %}
+                <div class="list-group">
+                    {% for topic in module.topics.all %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ topic.name }}</h6>
+                                {% if topic.description %}
+                                <p class="mb-1 text-muted">{{ topic.description }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <span class="badge bg-secondary me-2">{{ topic.duration_hours }} hours</span>
+                                <div class="btn-group">
+                                    <a href="{% url 'edit_topic' topic.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <a href="{% url 'delete_topic' topic.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-3">
+                    <p>No topics added yet.</p>
+                    <a href="{% url 'add_topic' module.id %}" class="btn btn-sm btn-primary">Add First Topic</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <h5>No modules added yet</h5>
+                <p class="text-muted">Start by adding modules to organize your course content</p>
+                <a href="{% url 'add_module' course.id %}" class="btn btn-primary">Add First Module</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

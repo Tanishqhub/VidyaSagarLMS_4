@@ -1,0 +1,93 @@
+{% extends 'institute/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Trainers Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'create_trainer' %}" class="btn btn-primary">Add New Trainer</a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Specialization</th>
+                <th>Experience</th>
+                <th>Active Batches</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trainer in trainers %}
+            <tr>
+                <td>
+                    <strong>{{ trainer.user.get_full_name }}</strong>
+                </td>
+                <td>{{ trainer.email }}</td>
+                <td>{{ trainer.phone }}</td>
+                <td>{{ trainer.specialization }}</td>
+                <td>{{ trainer.experience_years }} years</td>
+                <td>
+                    <span class="badge bg-primary">{{ trainer.get_active_batches_count }}</span>
+                </td>
+                <td>
+                    <span class="badge bg-{% if trainer.is_active %}success{% else %}secondary{% endif %}">
+                        {% if trainer.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-outline-primary">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center py-4">
+                    <div class="text-muted">
+                        <h5>No trainers found</h5>
+                        <p>Add your first trainer to get started</p>
+                        <a href="{% url 'create_trainer' %}" class="btn btn-primary mt-2">Add Trainer</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if trainers.has_other_pages %}
+<nav aria-label="Trainer pagination">
+    <ul class="pagination justify-content-center">
+        {% if trainers.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ trainers.previous_page_number }}">Previous</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Previous</span>
+        </li>
+        {% endif %}
+        
+        {% for i in trainers.paginator.page_range %}
+        <li class="page-item {% if trainers.number == i %}active{% endif %}">
+            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+        </li>
+        {% endfor %}
+        
+        {% if trainers.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ trainers.next_page_number }}">Next</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">Next</span>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
